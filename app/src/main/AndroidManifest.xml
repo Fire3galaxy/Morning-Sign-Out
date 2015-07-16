@@ -38,10 +38,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />
         </activity>
-
-        <provider
-            android:authorities="app.morningsignout.com.morningsignoff"
-            android:name=".HeadlineArtProvider"/>
     </application>
 
 </manifest>

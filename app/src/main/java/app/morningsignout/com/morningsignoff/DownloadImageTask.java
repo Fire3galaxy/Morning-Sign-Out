@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.apache.commons.io.IOUtils;
-
 import app.morningsignout.com.morningsignoff.HeadlineArtContract.*;
 
 /**
@@ -68,7 +66,6 @@ public class DownloadImageTask extends AsyncTask<Integer, Void, Article> {
         Article article = FetchHeadlineArticles.getArticles("featured",
                 headlinePageNumber[0]);
 
-        Cursor c = getH_articleLINK(article.getLink());
         try {
             byte[] bytes;
 
@@ -76,33 +73,13 @@ public class DownloadImageTask extends AsyncTask<Integer, Void, Article> {
             BitmapFactory.Options a = new BitmapFactory.Options();
             a.inSampleSize = 1;
 
-            // Not found in database
-            if (c.getCount() == 0) {
-                // Download image from imageURL
-                InputStream in = new URL(article.getImageURL()).openStream();
-
-                // Store inputStream buffer contents in byte array through bytearrayoutputstream
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                IOUtils.copy(in, baos);
-                bytes = baos.toByteArray();
-
-                // Insert into database for quick loading later (_id starts with 1)
-//                addH_article(article.getTitle(), article.getLink(), baos.toByteArray());
-            }
-            // Found in database, do not download image from internet
-            else {
-                c.moveToFirst();
-                bytes = c.getBlob(c.getColumnIndex(H_articleEntry.COLUMN_IMAGEBYTESTREAM));
-            }
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            // Download image from website
+            InputStream in = new URL(article.getImageURL()).openStream();
 
             // Save bitmap here
-            article.setBitmap(BitmapFactory.decodeStream(bais, null, a));
+            article.setBitmap(BitmapFactory.decodeStream(in, null, a));
         } catch (IOException e) {
             Log.e("HEADLINE IMAGE DOWNLOAD", e.getMessage());
-        } finally {
-            if (c != null) c.close();
         }
 
         return article;
