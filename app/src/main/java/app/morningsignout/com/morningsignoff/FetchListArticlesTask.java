@@ -50,13 +50,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         this.pageNum = pageNum;
     }
 
-    public FetchListArticlesTask() {
-    }
-
     @Override
     protected void onPreExecute() {
-        // initialize the batch number to be 1 when no articles are loaded
-
     }
 
     // takes in the category name as a sufix to the URL, ex. healthcare/  and call getArticles()
@@ -78,9 +73,6 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // Avoids redundancy if bar is gone
         if (progressBar.getVisibility() != ProgressBar.GONE)
             progressBar.setVisibility(ProgressBar.GONE);
-        // If loading more articles is finished, make this go away again
-//        if (loadingMoreArticles.getVisibility() == ProgressBar.VISIBLE)
-//            loadingMoreArticles.setVisibility(ProgressBar.INVISIBLE);
 
         // Setup the adapter using the CategoryAdapter class
         // If the adapter is not set, then create the adapter and add the articles

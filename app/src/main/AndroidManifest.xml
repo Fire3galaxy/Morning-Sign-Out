@@ -37,6 +37,9 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.morningsignout.com.morningsignoff.CategoryActivity" />
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
     </application>
 

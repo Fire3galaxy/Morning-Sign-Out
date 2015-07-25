@@ -1,24 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/title_activity_article"
-        android:id="@+id/title_actionBar"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:singleLine="true"
-        android:background="#00ffffff"
-        android:ellipsize="end"
-        android:textColor="@color/bright_foreground_material_dark"
-        android:textIsSelectable="false"
-        android:textStyle="bold|italic"
-        android:textSize="19sp"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
-        android:longClickable="false"
-        android:linksClickable="false" />
-</RelativeLayout>
+<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:contentDescription="@string/title_contentDescription"
+    android:src="@drawable/mso_rectangle"
+    android:scaleType="centerInside"
+    android:background="@android:color/transparent"
+    android:onClick="returnToParent" />

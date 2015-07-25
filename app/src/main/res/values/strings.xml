@@ -12,12 +12,15 @@
     <string name="article">A flash of blinding light engulfs all of Gravity Falls. Then, everything comes down to earth. The portal, now a mess of tangled wires and metal, glows bright blue. A figure emerges from the portal. The blue light fades behind him. He walks forward, placing a six-fingered hand on the cover of the first journal, then picks it up and places it into the inside pocket of a long, dark coat.</string>
 
     <string name="action_style">Style!</string>
+    <string name="action_search">Search</string>
+
     <string name="title_activity_category">CategoryActivity</string>
     <string name="title_activity_article">ArticleActivity</string> <!-- In menu_main.xml, we can add items to the action bar!
                                                      Set showAsAction to strings like never, ifRoom, etc to show!-->
 
-    <string name="hello_world">Hello --- world!</string>
+    <string name="search_hint">Enter an article you\'re looking for</string>
 
+    <string name="title_contentDescription">app home button</string>
 
     <string-array name ="descriptions">
         <item>description 1</item>

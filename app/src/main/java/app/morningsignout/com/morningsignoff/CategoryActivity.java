@@ -37,7 +37,6 @@ public class CategoryActivity extends ActionBarActivity {
         // setContentView(R.layout.activity_category);
         list = (ListView)findViewById(R.id.listView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar2 = (ProgressBar) findViewById(R.id.progressBar2);
 
         // Fetch the category name from Intent, which is set in MainPageFragment
         Intent intent = getIntent();
@@ -215,7 +214,6 @@ class CategoryAdapter extends BaseAdapter{
 
         // Prepare prepped row objects in single holder object for fetchCategoryImageTask
         AdapterObject holder = new AdapterObject();
-        holder.adapter = this;  // for notifyDataSetChanged
         holder.title = title;
         holder.description = description;
         holder.image = image;
@@ -225,6 +223,10 @@ class CategoryAdapter extends BaseAdapter{
         SingleRow rowTemp = articles.get(i);
         title.setText(rowTemp.title);
         description.setText(rowTemp.description);
+
+        String s = "null";
+        if (rowTemp.image != null) s = "not null";
+        Log.e("ImageLog", "Item " + Integer.toString(i) + ", is " + s);
 
         // Load image into row element
         if (rowTemp.image == null)  // download

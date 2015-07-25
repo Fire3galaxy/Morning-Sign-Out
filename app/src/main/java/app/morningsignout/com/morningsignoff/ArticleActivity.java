@@ -1,21 +1,29 @@
 package app.morningsignout.com.morningsignoff;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.TextView;
+import android.widget.ImageButton;
 
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
     private String category;
+    private WebView webView;
+    private ArticleWebViewClient webViewClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,27 +34,25 @@ public class ArticleActivity extends ActionBarActivity {
         // Set the title for this activity to the article title
         Intent intent = getIntent();
         if (intent != null) {
-            // Setting variable category and title of activity
+            // Setting variable category (healthcare, wellness, etc.) and title of activity (article name)
             category = getIntent().getStringExtra(Intent.EXTRA_TITLE);
             setTitle(getIntent().getStringExtra(Intent.EXTRA_SHORTCUT_NAME));
 
-            // Disabling title text of actionbar
-            this.getSupportActionBar().setDisplayShowCustomEnabled(true);
+            // ImageButton is Morning Sign Out logo, which sends user back to home screen (see XML)
+            // Setting imageButton to center of actionbar
+            ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title, null);
+            ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
+            this.getSupportActionBar().setCustomView(ib, params);
+
+            // Disabling title text of actionbar, enabling imagebutton
             this.getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-            // Setting title of actionbar to article's name FIXME: No title vs ellipsized title vs something else?
-            View v = getLayoutInflater().inflate(R.layout.title, null);
-
-            ((TextView) v.findViewById(R.id.title_actionBar)).setText(getTitle());
-            v.setSelected(true);
-
-            this.getSupportActionBar().setCustomView(v);
+            this.getSupportActionBar().setDisplayShowCustomEnabled(true);
 
             // Getting article from URL and stripping away extra parts of website for better reading
-            WebView article = (WebView) findViewById(R.id.webView_article);
-            article.setWebViewClient(new ArticleWebViewClient());
-            // article.loadUrl(getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
-            new URLToMobileArticle(article).execute(getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
+            webView = (WebView) findViewById(R.id.webView_article);
+            webViewClient = new ArticleWebViewClient();
+            webView.setWebViewClient(webViewClient);
+            new URLToMobileArticle(webView).execute(getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
         }
     }
 
@@ -55,6 +61,16 @@ public class ArticleActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_article, menu);
+
+        // FIXME: finish this by adding search activity http://developer.android.com/training/search/setup.html
+        // Associate searchable configuration with the SearchView
+//        SearchManager searchManager =
+//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView searchView =
+//                (SearchView) menu.findItem(R.id.action_search).getActionView();
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
+
         return true;
     }
 
@@ -66,13 +82,35 @@ public class ArticleActivity extends ActionBarActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                Log.e(category, "yyyyyyyyyyyyy");
-                Intent intent = NavUtils.getParentActivityIntent(this);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                intent.putExtra(Intent.EXTRA_TITLE, category);
-                NavUtils.navigateUpTo(this, intent);
+                if (webView != null && webView.canGoBack()) {  // Go back in webView history
+                    webView.goBack();
+                } else {                    // Return to front page (without recreating parent)
+                    returnToParent(null);
+                }
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // Check if the key event was the Back button and if there's history
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && webView.canGoBack()) {
+            webView.goBack();
+            return true;
+        }
+
+        // If it wasn't the Back key or there's no web page history, bubble up to the default
+        // system behavior (probably exit the activity)
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void returnToParent(View view) {
+        Log.e(category, "yyyyyyyyyyyyy");
+        Intent intent = NavUtils.getParentActivityIntent(this);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra(Intent.EXTRA_TITLE, category);
+        NavUtils.navigateUpTo(this, intent);
     }
 }
 
