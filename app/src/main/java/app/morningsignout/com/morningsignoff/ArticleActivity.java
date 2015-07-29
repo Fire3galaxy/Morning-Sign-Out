@@ -1,6 +1,7 @@
 package app.morningsignout.com.morningsignoff;
 
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -56,27 +57,25 @@ public class ArticleActivity extends ActionBarActivity {
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_article, menu);
 
-        // FIXME: finish this by adding search activity http://developer.android.com/training/search/setup.html
-        // Associate searchable configuration with the SearchView
-//        SearchManager searchManager =
-//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        SearchView searchView =
-//                (SearchView) menu.findItem(R.id.action_search).getActionView();
-//        searchView.setSearchableInfo(
-//                searchManager.getSearchableInfo(getComponentName()));
+        /* Search results in new activity, clicked article passed back to articleActivity
+           Associate searchable configuration with the SearchView */
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+
+        ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
 
         return true;
     }
 
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
+    /* Handle action bar item clicks here. The action bar will
+       automatically handle clicks on the Home/Up button, so long
+       as you specify a parent activity in AndroidManifest.xml. */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -100,13 +99,12 @@ public class ArticleActivity extends ActionBarActivity {
             return true;
         }
 
-        // If it wasn't the Back key or there's no web page history, bubble up to the default
-        // system behavior (probably exit the activity)
+        // If it wasn't the Back key or there's no web page history, use default system behavior
         return super.onKeyDown(keyCode, event);
     }
 
+    // view parameter needed for title.xml onClick()
     public void returnToParent(View view) {
-        Log.e(category, "yyyyyyyyyyyyy");
         Intent intent = NavUtils.getParentActivityIntent(this);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra(Intent.EXTRA_TITLE, category);

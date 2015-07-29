@@ -212,12 +212,10 @@ class CategoryAdapter extends BaseAdapter{
         ImageView image = (ImageView) row.findViewById(R.id.imageView);
         ProgressBar pb = (ProgressBar) row.findViewById(R.id.progressBarSingleRow);
 
-        // Prepare prepped row objects in single holder object for fetchCategoryImageTask
-        AdapterObject holder = new AdapterObject();
-        holder.title = title;
-        holder.description = description;
-        holder.image = image;
-        holder.pb = pb;
+        /* On getting view, set this to invisible until loaded. (issue before: old image seen
+           before new image on fast scroll) Mostly fixed by this, but on fast scroll down, still
+           shows a little */
+        image.setImageDrawable(null);
 
         // Set the values of the rowItem
         SingleRow rowTemp = articles.get(i);
@@ -229,9 +227,17 @@ class CategoryAdapter extends BaseAdapter{
         Log.e("ImageLog", "Item " + Integer.toString(i) + ", is " + s);
 
         // Load image into row element
-        if (rowTemp.image == null)  // download
+        if (rowTemp.image == null) {    // download
+            // Prepare prepped row objects in single holder object for fetchCategoryImageTask
+            AdapterObject holder = new AdapterObject();
+            holder.title = title;
+            holder.description = description;
+            holder.image = image;
+            holder.pb = pb;
+
             new FetchCategoryImageTask(rowTemp, holder).execute();
-        else {                              // set saved image
+        }
+        else {                          // set saved image
             // Cropping image to preserve aspect ratio
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
             image.setCropToPadding(true);
