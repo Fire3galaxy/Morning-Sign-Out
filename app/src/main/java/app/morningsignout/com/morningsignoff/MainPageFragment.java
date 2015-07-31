@@ -56,22 +56,22 @@ public class MainPageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // changing menu through fragment
-        setHasOptionsMenu(true);
+//        // changing menu through fragment
+//        setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main, menu);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_main, menu);
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Action bar (Home and Up button clicks have default to parent activity in Andr...Manifest
-        int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            return true;
-        }
+//        int id = item.getItemId();
+//        if (id == R.id.action_refresh) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -80,8 +80,6 @@ public class MainPageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final String PLACEHOLDER = "PLACEHOLDER";
-
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         ArrayList<String> articles = new ArrayList<>(Arrays.asList(categoriesOnDisplay));

@@ -45,15 +45,13 @@ public class HeadlineFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        page_number = getArguments().getInt(IMAGE_NUMBER);
-        if (savedInstanceState == null) Log.e("onCreate", "bundle is null");
+        page_number = getArguments() != null ? getArguments().getInt(IMAGE_NUMBER) : -1;
+        if (page_number == -1) Log.e("HeadlineFragment", "bundle is null");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final String logString = "HEADLINE"; // for log cat
-
         // Set up view with layout item
         View rootView = inflater.inflate(R.layout.fragment_headline, container, false);
 

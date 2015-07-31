@@ -18,10 +18,12 @@
     <string name="title_activity_article">ArticleActivity</string>
     <!-- In menu_main.xml, we can add items to the action bar! Set showAsAction to strings like never, ifRoom, etc to show!-->
     <string name="title_activity_search">SearchResultsActivity</string>
+    <string name="title_contentDescription">app home button</string>
 
     <string name="search_hint">Search MorningSignOut</string>
 
-    <string name="title_contentDescription">app home button</string>
+    <string name="error">Something went wrong. Please report this bug to the developers in the play
+        store comment section.</string>
 
     <string-array name ="descriptions">
         <item>description 1</item>
@@ -30,4 +32,25 @@
         <item>description 4</item>
     </string-array>
 
+    <string-array name ="categories">
+        <item>Latest</item>
+        <item>Featured</item>
+        <item>Research</item>
+        <item>Wellness</item>
+        <item>Humanities</item>
+        <item>Medicine</item>
+        <item>Public Health</item>
+        <item>Healthcare</item>
+    </string-array>
+
+    <string-array name ="categories_for_url">
+        <item>latest</item>
+        <item>featured</item>
+        <item>research</item>
+        <item>wellness</item>
+        <item>humanities</item>
+        <item>medicine</item>
+        <item>public-health</item>
+        <item>healthcare</item>
+    </string-array>
 </resources>

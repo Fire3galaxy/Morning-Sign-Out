@@ -108,6 +108,7 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // Not important
     @Override
     protected void onPause() {
         super.onPause();
