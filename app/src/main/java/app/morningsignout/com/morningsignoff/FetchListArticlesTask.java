@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -82,6 +83,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         } else {
             CategoryAdapter categoryAdapter = (CategoryAdapter) listView.getAdapter();
             categoryAdapter.loadMoreItems(articles, pageNum);
+            Log.d("FetchListArticlesTask", "Calling loadMoreItems " + Integer.toString(pageNum));
         }
 
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -125,6 +127,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                             //loadingMoreArticles.setVisibility(ProgressBar.VISIBLE);
 
                             new FetchListArticlesTask(c, listView, progressBar, ++pageNum).execute(category);
+                            Log.d("FetchListArticlesTask", "Loading more articles: page " + Integer.toString(pageNum));
                         }
                         isScrolling = false;
                     }
@@ -144,9 +147,10 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // String arg is "research", "wellness", "humanities", etc.
         // For getting article titles, descriptions, and images. See class Article
         Parser p = new Parser();
-        String urlPath = null;
-        if (arg.equals("latest/")) urlPath = "http://morningsignout.com/" + arg + pageNum;
+        String urlPath = "";
+        if (arg.equals("latest/")) urlPath = "http://morningsignout.com/" + arg + "page/" + pageNum;
         else urlPath = "http://morningsignout.com/category/" + arg + "page/" + pageNum;
+        Log.d("FetchListArticlesTask", "loading " + urlPath);
 
         BufferedReader in = null;
         HttpURLConnection c = null; // Done because of tutorial
@@ -160,7 +164,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
             if (c.getInputStream() == null) return null; // Stream was null, why?
 
-            in = new BufferedReader(new InputStreamReader(c.getInputStream() ) );
+            in = new BufferedReader(new InputStreamReader(c.getInputStream()) );
             String inputLine;
 
             // For parsing the html
@@ -241,5 +245,14 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
         return null; // Exiting try/catch likely means error occurred.
     }
+
+//    static String toUTF16(String s) {
+//        try {
+//            return new String(s.getBytes("UTF-8"), "UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//            Log.e("FetchListArticlesTask", e.getMessage());
+//        }
+//        return null;
+//    }
 }
 

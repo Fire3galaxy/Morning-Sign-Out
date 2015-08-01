@@ -67,13 +67,14 @@ public class FetchCategoryImageTask extends AsyncTask<Void, Void, Bitmap> {
             if (inputStream != null) {
                 // Lowers resolution of images by subsampling image, saves memory & time
                 BitmapFactory.Options a = new BitmapFactory.Options();
-                a.inSampleSize = 1;
+                a.inSampleSize = 2;
 
                 // Create bitmap from stream
                 return BitmapFactory.decodeStream(inputStream, null, a);
             }
+            else Log.e("FetchCategoryImageTask", "image url: " + url);
         } catch (Exception e) {
-            Log.w("ImageDownloader", "Error downloading image from " + url);
+            Log.e("FetchCategoryImageTask", "Error downloading image from " + url);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

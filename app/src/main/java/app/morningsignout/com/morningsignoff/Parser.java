@@ -48,6 +48,7 @@ public class Parser {
         ret = ret.replace("&#038;", "\u0026"); // ampersand
         ret = ret.replace("&amp;", "\u0026"); // ampersand
         ret = ret.replace("&#8211;", "\u2013"); // en dash
+		ret = ret.replace("&#8216;", "\u2018"); // left quotation mark
 		ret = ret.replace("&#8217;", "\u2019");
 		ret = ret.replace("&#8220;", "\u201C");
 		ret = ret.replace("&#8221;", "\u201D");

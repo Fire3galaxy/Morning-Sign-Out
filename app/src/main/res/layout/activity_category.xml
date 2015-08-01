@@ -8,7 +8,8 @@
     <LinearLayout
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/container_category">
+        android:id="@+id/container_category"
+        android:clickable="true">
     </LinearLayout>
 
     <!--For the category swipe menu-->

@@ -96,6 +96,7 @@ class CategoryAdapter extends BaseAdapter {
         pageNum = 0;
 
         loadMoreItems(articles, 1);
+        Log.d("CategoryAdapter", "First time calling loadMoreItems");
 
         // FIXME: Actually, just post a "no articles" thing or a "is your internet on?" or something
         if (articles.isEmpty()) {
@@ -188,9 +189,9 @@ class CategoryAdapter extends BaseAdapter {
             this.pageNum = pageNum;
 
             // Testing CategoryAdapter
-            Log.e("loading more" + this.pageNum, "eeeeeeee");
-            Log.e("Moresize" + moreArticles.size(), "eeeeeeee");
-            Log.e("row" + articles.size(), "eeeeeeee");
+            Log.e("CategoryAdapter", "loading more" + this.pageNum);
+            Log.e("CategoryAdapter", "Moresize" + moreArticles.size());
+            Log.e("CategoryAdapter", "row" + articles.size());
 
             for (int i = 0; i < moreArticles.size(); ++i) {
                 articles.add(SingleRow.newInstance(moreArticles.get(i)));

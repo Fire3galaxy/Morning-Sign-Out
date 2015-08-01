@@ -179,17 +179,19 @@ public class CategoryActivity extends ActionBarActivity {
     }
 
     void selectItem(int position) {
-        this.position = position;
+        if (this.position != position) {
+            this.position = position;
 
-        CategoryFragment fragment = new CategoryFragment();
-        Bundle args = new Bundle();
-        args.putString(CategoryFragment.EXTRA_TITLE, categories_urls[position]);
-        fragment.setArguments(args);
+            CategoryFragment fragment = new CategoryFragment();
+            Bundle args = new Bundle();
+            args.putString(CategoryFragment.EXTRA_TITLE, categories_urls[position]);
+            fragment.setArguments(args);
 
-        // Insert the fragment by replacing any existing fragment
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_category, fragment)
-                .commit();
+            // Insert the fragment by replacing any existing fragment
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container_category, fragment)
+                    .commit();
+        }
 
         // Highlight the selected item, update the title, and close the drawer
         mDrawerList.setItemChecked(position, true);
