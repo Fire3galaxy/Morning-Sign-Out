@@ -26,29 +26,8 @@ import android.R.*;
  * Creates the listview for all categories in the main page
  */
 public class MainPageFragment extends Fragment {
-    // Used by OnItemClick to specific the category of the CategoryActivity
-    String[] categories = {
-            "latest",
-            "featured",
-            "research",
-            "wellness",
-            "humanities",
-            "medicine",
-            "public-health",
-            "healthcare",
-    };
-
     // Those are the categories shown on the buttons in the main page
-    String[] categoriesOnDisplay = {
-            "Latest",
-            "Featured",
-            "Research",
-            "Wellness",
-            "Humanities",
-            "Medicine",
-            "Public Health",
-            "Healthcare",
-    };
+    String[] categories_titles;
 
     public MainPageFragment() {
     }
@@ -56,6 +35,7 @@ public class MainPageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        categories_titles = getResources().getStringArray(R.array.categories);
 //        // changing menu through fragment
 //        setHasOptionsMenu(true);
     }
@@ -82,13 +62,13 @@ public class MainPageFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ArrayList<String> articles = new ArrayList<>(Arrays.asList(categoriesOnDisplay));
+        ArrayList<String> categories = new ArrayList<>(Arrays.asList(categories_titles));
 
         // Adapter that will send array's data to list view
         final ArrayAdapter<String> stringAdapter = new ArrayAdapter<>(getActivity(),
                 R.layout.list_items_mainpage,
                 R.id.list_item_button,
-                articles);
+                categories);
 
         ListView lv_frag = (ListView) rootView.findViewById(R.id.listview_articles);
         lv_frag.setAdapter(stringAdapter);
@@ -103,11 +83,10 @@ public class MainPageFragment extends Fragment {
 //            toast.show();
 
                 // Give the categoryActivity a category title
-                String category = categories[position];
-                Log.e(category, "category_category");
+                Log.e("MainPageFragment", "category_category");
                 Intent categoryPageIntent = new Intent(getActivity(), CategoryActivity.class);
                 //categoryPageIntent.putExtra(Intent.EXTRA_TITLE, stringAdapter.getItem(position));
-                categoryPageIntent.putExtra(Intent.EXTRA_TITLE, category);
+                categoryPageIntent.putExtra(Intent.EXTRA_TITLE, position);
                 startActivity(categoryPageIntent);
             }
         });

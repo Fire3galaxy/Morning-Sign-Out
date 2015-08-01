@@ -1,14 +1,18 @@
 package app.morningsignout.com.morningsignoff;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -18,11 +22,18 @@ public class CategoryActivity extends ActionBarActivity {
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    // Title of activity when drawer swipe menu is visible
-    private String mDrawerTitle;
+    private String mDrawerTitle;        // Title of activity when drawer swipe menu is visible
+    private String mTitle;              // Current Title
+    private String[] categories_urls,   // category strings for url usage
+            categories_titles;          // ... for Title usage
+    private int position;               // position in category array
 
-    // Current Title
-    private String mTitle;
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            selectItem(position);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,33 +42,35 @@ public class CategoryActivity extends ActionBarActivity {
         // Use the ListView layout from fragmment_category_main.xml,
         setContentView(R.layout.activity_category);
 
-        if (getIntent() != null) {
-            mTitle = getIntent().getStringExtra(Intent.EXTRA_TITLE);
-            mDrawerTitle = "Categories Menu";
-            setTitle(mTitle.substring(0, 1).toUpperCase() + mTitle.substring(1));
-        } else {
-            mTitle = "";
-            mDrawerTitle = mTitle;
-            setTitle("");
-        }
+        categories_titles = getResources().getStringArray(R.array.categories);
+        categories_urls = getResources().getStringArray(R.array.categories_for_url);
+        position = -1;
+
+        // Set up title
+        if (getIntent() != null)
+            position = getIntent().getIntExtra(Intent.EXTRA_TITLE, -1);
+        setupActivityTitle();
 
         // For DrawerLayout (no fragment)
         mDrawerList = (ListView) findViewById(R.id.listView_slide);
-        String[] categories = getResources().getStringArray(R.array.categories);
         ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
                 R.layout.list_items_slide,
-                categories);
-        mDrawerList.setAdapter(mAdapter);
+                categories_titles);
+
+        mDrawerList.setAdapter(mAdapter); // Set up adapter for listview
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // Change up button of actionbar to 3 horizontal bars for slide
         setUpButtonToTripleBar();
         // Set up button to open/close drawer and change title of current activity
         setDrawerListenerToActionBarToggle();
 
+        Log.d("CategoryActivity", "mTitle = " + mTitle.toLowerCase());
+
         // For CategoryFragment
         CategoryFragment fragment = new CategoryFragment();
         Bundle args = new Bundle();
-        args.putString(CategoryFragment.EXTRA_TITLE, mTitle);
+        args.putString(CategoryFragment.EXTRA_TITLE, categories_urls[position]);
         fragment.setArguments(args);
 
         // Set fragment's listview
@@ -124,8 +137,18 @@ public class CategoryActivity extends ActionBarActivity {
         mDrawerToggle.onConfigurationChanged(newConfig); // pass it on to toggle
     }
 
-    void initializeTitles() {
-
+    void setupActivityTitle() {
+        if (position == -1) { // Error
+            mTitle = "";
+            mDrawerTitle = mTitle;
+            setTitle("");
+            Log.e("CategoryActivity", "Titles are blank. Check that intent is not null and " +
+                    "has int position");
+        } else {
+            mTitle = categories_titles[position];
+            mDrawerTitle = "Categories Menu";
+            setTitle(mTitle);
+        }
     }
 
     void setUpButtonToTripleBar() {
@@ -137,7 +160,9 @@ public class CategoryActivity extends ActionBarActivity {
 
     void setDrawerListenerToActionBarToggle() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,
+                mDrawerLayout,
                 R.string.title_slide_menu,
                 R.string.title_activity_category) {
             public void onDrawerClosed(View view) {
@@ -151,5 +176,24 @@ public class CategoryActivity extends ActionBarActivity {
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    void selectItem(int position) {
+        this.position = position;
+
+        CategoryFragment fragment = new CategoryFragment();
+        Bundle args = new Bundle();
+        args.putString(CategoryFragment.EXTRA_TITLE, categories_urls[position]);
+        fragment.setArguments(args);
+
+        // Insert the fragment by replacing any existing fragment
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container_category, fragment)
+                .commit();
+
+        // Highlight the selected item, update the title, and close the drawer
+        mDrawerList.setItemChecked(position, true);
+        setTitle(categories_titles[position]);
+        mDrawerLayout.closeDrawer(mDrawerList);
     }
 }

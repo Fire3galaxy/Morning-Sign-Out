@@ -34,7 +34,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
     // Used for creating CategoryAdapter and onItemClick listener
     private ListView listView;
-    private ProgressBar progressBar, loadingMoreArticles;
+    private ProgressBar progressBar;
     private Context c;
     private String category;
 
@@ -42,11 +42,10 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
     private int pageNum;
 
     public FetchListArticlesTask(Context c, ListView listView, ProgressBar progressBar,
-                                 ProgressBar progressBar2, int pageNum) {
+                                 int pageNum) {
         this.c = c;
         this.listView = listView;
         this.progressBar = progressBar;
-        this.loadingMoreArticles = progressBar2;
         this.pageNum = pageNum;
     }
 
@@ -125,7 +124,7 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
                              */
                             //loadingMoreArticles.setVisibility(ProgressBar.VISIBLE);
 
-                            new FetchListArticlesTask(c, listView, progressBar, loadingMoreArticles, ++pageNum).execute(category);
+                            new FetchListArticlesTask(c, listView, progressBar, ++pageNum).execute(category);
                         }
                         isScrolling = false;
                     }
@@ -145,12 +144,9 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
         // String arg is "research", "wellness", "humanities", etc.
         // For getting article titles, descriptions, and images. See class Article
         Parser p = new Parser();
-        String urlPath;
-        if (arg.equals("latest/")){
-            urlPath = "http://morningsignout.com/latest/page/" + pageNum;
-        }else {
-            urlPath = "http://morningsignout.com/category/" + arg +"page/" + pageNum;
-        }
+        String urlPath = null;
+        if (arg.equals("latest/")) urlPath = "http://morningsignout.com/" + arg + pageNum;
+        else urlPath = "http://morningsignout.com/category/" + arg + "page/" + pageNum;
 
         BufferedReader in = null;
         HttpURLConnection c = null; // Done because of tutorial
@@ -221,8 +217,8 @@ public class FetchListArticlesTask extends AsyncTask<String, Void, List<Article>
 
             }
             in.close();
-//	        for (int i = 0; i < articles.size(); i++)
-//	        	System.out.println(articles.get(i).getDescription());
+//	        for (int i = 0; i < articlesList.size(); i++)
+//	        	Log.e("FetchListArticlesTask", articlesList.get(i).getDescription());
 
             // If buffer was empty, no items in list, so website has no articles for some reason.
             return articlesList.isEmpty() ? null : articlesList;

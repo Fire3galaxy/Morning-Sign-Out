@@ -31,7 +31,6 @@ public class CategoryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         category = getArguments() != null ? getArguments().getString(EXTRA_TITLE) + "/" : "";
-        if (savedInstanceState == null) Log.e("onCreate", "bundle is null");
     }
 
     @Override
@@ -43,7 +42,7 @@ public class CategoryFragment extends Fragment {
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
 
         // Use Asynctask to fetch article from the given category
-        new FetchListArticlesTask(getActivity(), list, progressBar, progressBar2, 1).execute(category);
+        new FetchListArticlesTask(getActivity(), list, progressBar, 1).execute(category);
 
         // Setup the click listener for the listView
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -185,7 +184,7 @@ class CategoryAdapter extends BaseAdapter {
 //        }
 
         // if prevent the late page from loading twice
-        if(moreArticles!= null && this.pageNum != pageNum){
+        if(moreArticles != null && this.pageNum != pageNum){
             this.pageNum = pageNum;
 
             // Testing CategoryAdapter
