@@ -13,6 +13,7 @@ import java.net.URLConnection;
 
 public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     WebView wb;
+    String link;
 
     public URLToMobileArticle(WebView webview) {
         this.wb = webview;
@@ -26,11 +27,14 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(final String html) {
         wb.loadData(html, "text/html; charset=UTF-8", null);
+//        wb.loadDataWithBaseURL(link, html, "text/html; charset=UTF-8", null, null);
+		Log.d("URLToMobileArticle", "Loaded webpage " + link);
     }
 
-	public static String getArticle(String link) {
+	public String getArticle(String link) {
 		URL url;
 		String html_new;
+        this.link = link;
 		try {
 			url = new URL(link);
 			URLConnection c = url.openConnection();

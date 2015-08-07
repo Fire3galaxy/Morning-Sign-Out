@@ -85,12 +85,17 @@ public class SearchResultsActivity extends ActionBarActivity {
 class SearchWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        // if it is morning sign out AND is an article, send url to ArticleActivity
         if(Uri.parse(url).getHost().endsWith("morningsignout.com")) {
-            return false;
+            Intent intent = new Intent(view.getContext(), ArticleActivity.class);
+            intent.putExtra(Intent.EXTRA_RETURN_RESULT, url); // Put url in intent
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); // Open w/ old articleActivity if exists
+            view.getContext().startActivity(intent);
+            return true;
         }
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        view.getContext().startActivity(intent);
-        return true;
+//        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+//        view.getContext().startActivity(intent);
+        return false;
     }
 }

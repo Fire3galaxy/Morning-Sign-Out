@@ -53,7 +53,7 @@ public class ArticleActivity extends ActionBarActivity {
             webView = (WebView) findViewById(R.id.webView_article);
             webViewClient = new ArticleWebViewClient();
             webView.setWebViewClient(webViewClient);
-            new URLToMobileArticle(webView).execute(getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
+//            new URLToMobileArticle(webView).execute(getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
         }
     }
 
@@ -103,6 +103,33 @@ public class ArticleActivity extends ActionBarActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    /* Note: The activity cycle says that onNewIntent and onResume will occur even in normal app
+     * function. Hence, these two functions should NOT change the normal function of the activity
+     * and only load a new url if given through SearchResultsActivity's new intent
+     */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        // change activity intent to the one from SearchResultsActivity
+        setIntent(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // URL from CategoryActivity
+        String intentURL = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
+
+        // Set webView to new article
+        if (intentURL != null) new URLToMobileArticle(webView).execute(intentURL);
+        else {
+            // If statement is reached, then intent originated from SearchResultsActivity
+            intentURL = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);
+            new URLToMobileArticle(webView).execute(intentURL);
+            Log.d("ArticleActivity", "Loading: " + intentURL);
+        }
+    }
+
     // view parameter needed for title.xml onClick()
     public void returnToParent(View view) {
         Intent intent = NavUtils.getParentActivityIntent(this);
@@ -117,6 +144,8 @@ public class ArticleActivity extends ActionBarActivity {
 class ArticleWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        Log.d("ArticleActivity", "In webviewclient, loading " + url);
+
         if(Uri.parse(url).getHost().endsWith("morningsignout.com")) {
             return false;
         }
