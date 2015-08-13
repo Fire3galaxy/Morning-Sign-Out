@@ -16,14 +16,23 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
     private String category;
-    private WebView webView;
+    private CustomWebView webView;
     private ArticleWebViewClient webViewClient;
 
     @Override
@@ -50,7 +59,7 @@ public class ArticleActivity extends ActionBarActivity {
             this.getSupportActionBar().setDisplayShowCustomEnabled(true);
 
             // Getting article from URL and stripping away extra parts of website for better reading
-            webView = (WebView) findViewById(R.id.webView_article);
+            webView = (CustomWebView) findViewById(R.id.webView_article);
             webViewClient = new ArticleWebViewClient();
             webView.setWebViewClient(webViewClient);
 //            new URLToMobileArticle(webView).execute(getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
@@ -142,6 +151,8 @@ public class ArticleActivity extends ActionBarActivity {
 
 // Create a customized webview client to disable website navigation bar
 class ArticleWebViewClient extends WebViewClient {
+    final String LOG_NAME = "ArticleWebViewClient";
+
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         Log.d("ArticleActivity", "In webviewclient, loading " + url);
@@ -153,5 +164,71 @@ class ArticleWebViewClient extends WebViewClient {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         view.getContext().startActivity(intent);
         return true;
+    }
+
+    // For API # < 21
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView wb, String url) {
+        WebResourceResponse wbresponse = super.shouldInterceptRequest(wb, url);
+
+        if (Uri.parse(url).getPath().equals("/alcohol-and-caffeine/")) {
+            Log.d(LOG_NAME, "changing webresponse");
+
+            String mimeType = "text/html";
+            String encoding = "gzip"; // Find encoding https://en.wikipedia.org/wiki/HTTP_compression
+            String html = URLToMobileArticle.getArticle("http://morningsignout.com/alcohol-and-caffeine/");
+            ByteArrayInputStream bais = new ByteArrayInputStream(html.getBytes());
+
+            wbresponse = new WebResourceResponse(mimeType,
+                    encoding,
+                    bais);
+        }
+
+        return wbresponse;
+    }
+
+    // Requires API 21
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView wb, WebResourceRequest wbrequest) {
+        if (wbrequest.getUrl().getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))
+            Log.d(LOG_NAME, wbrequest.getMethod() + ", " + wbrequest.getUrl());
+//        for (String s : wbrequest.getRequestHeaders().keySet()) {
+//            Log.d(LOG_NAME, s + " - " + wbrequest.getRequestHeaders().get(s));
+//        }
+//        Log.d(LOG_NAME, wbrequest.getUrl().getPath());
+
+        WebResourceResponse wbresponse = super.shouldInterceptRequest(wb, wbrequest);
+        Uri requestUrl = wbrequest.getUrl();
+
+        /* Not from morningsignout, e.g. googleapis, gstatic, or gravatar
+         * or an image/theme/plugin from wordpress
+         * or a .* file, e.g. favicon.ico
+         */
+        if (!requestUrl.getHost().endsWith("morningsignout.com")
+                || requestUrl.getPathSegments().get(0).equals("wp-content")
+                || requestUrl.getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))
+            return wbresponse;
+
+        // Article Page
+        if (wbrequest.getUrl().getPathSegments().size() == 1) {
+            Log.d(LOG_NAME, "changing webresponse to article page");
+
+            String mimeType = "text/html";
+            String encoding = "gzip"; // Find encoding https://en.wikipedia.org/wiki/HTTP_compression
+            Map<String, String> responseHeaders = new HashMap<String, String>(); // Finish responseHeaders for other accept types "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            responseHeaders.put("Content-Language", "en");
+            responseHeaders.put("URI", requestUrl.toString());
+            String html = URLToMobileArticle.getArticle(requestUrl.toString());
+            ByteArrayInputStream bais = new ByteArrayInputStream(html.getBytes());
+
+            wbresponse = new WebResourceResponse(mimeType,
+                    encoding,
+                    200,
+                    "Download html of valid url (from App team!)",
+                    responseHeaders,
+                    bais);
+        }
+
+        return wbresponse;
     }
 }

@@ -13,7 +13,7 @@ import java.net.URLConnection;
 
 public class URLToMobileArticle extends AsyncTask<String, Void, String> {
     WebView wb;
-    String link;
+	String link;
 
     public URLToMobileArticle(WebView webview) {
         this.wb = webview;
@@ -21,20 +21,20 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-        return getArticle(params[0]);
+        link = params[0];
+		return getArticle(params[0]);
     }
 
     @Override
     protected void onPostExecute(final String html) {
-        wb.loadData(html, "text/html; charset=UTF-8", null);
-//        wb.loadDataWithBaseURL(link, html, "text/html; charset=UTF-8", null, null);
+//        wb.loadData(html, "text/html; charset=UTF-8", null);
+        wb.loadDataWithBaseURL(link, html, "text/html; charset=UTF-8", null, link);
 		Log.d("URLToMobileArticle", "Loaded webpage " + link);
     }
 
-	public String getArticle(String link) {
+	public static String getArticle(String link) {
 		URL url;
 		String html_new;
-        this.link = link;
 		try {
 			url = new URL(link);
 			URLConnection c = url.openConnection();
@@ -58,6 +58,7 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
 	        String divRelated_o = "<div class=\"content__related\">", divRelated_c = "</div>";
 	        String divDisqusThread_o = "<div id=\"disqus_thread\">", divDisqusThread_c = "</div>";
 	        String divPostNav_o = "<div class=\"post-nav\">", divPostNav_c = "</div>";
+            String divSSBA_o = "<div class=\"ssba ssba-wrap\">", divSSBA_c = "</div>";
 
 	        // Find body substring
 	        int b_o = html.indexOf(body_o); 						// start of body
@@ -92,27 +93,40 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
 	        String sub_divCt_1 = deleteSub(sub_divCt, divR_o, b_divR_c);
 
 	        // Find divPost substring
-	        int a_divP_o = sub_divCt_1.indexOf(divPost_o);											// open div of content__post
-	        int a_divP_c = sub_divCt_1.lastIndexOf(divPost_c);										// close div of divContent
-	        int b_divP_c = sub_divCt_1.lastIndexOf(divPost_c, a_divP_c - 1) + divPost_c.length();	// close div of divPost
-	        String sub_divP = sub_divCt_1.substring(a_divP_o, b_divP_c);
-	        
+	        int a_divP_o = sub_divCt.indexOf(divPost_o);											// open div of content__post
+	        int a_divP_c = sub_divCt.lastIndexOf(divPost_c);										// close div of divContent
+	        int b_divP_c = sub_divCt.lastIndexOf(divPost_c, a_divP_c - 1) + divPost_c.length();	    // close div of divPost
+	        String sub_divP = sub_divCt.substring(a_divP_o, b_divP_c);
+
 	        // Trim divDisqusThread
 	        int divDT_o = sub_divP.indexOf(divDisqusThread_o);														// open div of disqus_thread
 	        int a_divDT_c = sub_divP.lastIndexOf(divDisqusThread_c);												// close div of divPost
 	        int b_divDT_c = sub_divP.lastIndexOf(divDisqusThread_c, a_divDT_c - 1) + divDisqusThread_c.length();	// close div of divDT
 	        String sub_divP_1 = deleteSub(sub_divP, divDT_o, b_divDT_c);
-	        
+
 	        // Trim divPostNav
 	        int divPN_o = sub_divP_1.indexOf(divPostNav_o);													// open div of post-nav
-	        int a_divPN_c = sub_divP_1.lastIndexOf(divPostNav_c);											// close div of divPost
-	        int b_divPN_c = sub_divP_1.lastIndexOf(divPostNav_c, a_divPN_c - 1) + divPostNav_c.length();	// close div of divPN
-	        String sub_divP_2 = deleteSub(sub_divP_1, divPN_o, b_divPN_c);
+//	        int a_divPN_c = sub_divP_1.lastIndexOf(divPostNav_c);											// close div of divPost
+//	        int b_divPN_c = sub_divP_1.lastIndexOf(divPostNav_c, a_divPN_c - 1) + divPostNav_c.length();	// close div of divPN
+//	        String sub_divP_2 = deleteSub(sub_divP_1, divPN_o, b_divPN_c);
+
+            // Trim divSSBA2
+            int divSSBA2_o = sub_divP_1.lastIndexOf(divSSBA_o);												// open div of ssba-wrap (2)
+            int a_divSSBA2_c = sub_divP_1.lastIndexOf(divSSBA_c, divPN_o) + divSSBA_c.length();				// close div of ssba-wrap (2)
+//	        int b_divSSBA2_c = sub_divP_2.lastIndexOf(divSSBA_c, a_divSSBA2_c) + divSSBA_c.length();
+            String sub_divP_2 = deleteSub(sub_divP_1, divSSBA2_o, a_divSSBA2_c);
+
+            // Trim divSSBA1
+            int divSSBA1_o = sub_divP_2.indexOf(divSSBA_o);													// open div of ssba-wrap (1)
+            int a_divSSBA1_c = sub_divP_2.lastIndexOf(divSSBA_c);											// close div of divPost
+            int b_divSSBA1_c = sub_divP_2.lastIndexOf(divSSBA_c, a_divSSBA1_c - 1);							// close div of divPN
+            int c_divSSBA1_c = sub_divP_2.lastIndexOf(divSSBA_c, b_divSSBA1_c - 1) + divSSBA_c.length();	// close div of ssba-wrap (1)
+            String sub_divP_3 = deleteSub(sub_divP_2, divSSBA1_o, c_divSSBA1_c);
 
             // -------------------------Done Trimming and Subdividing-------------------------------
 
 	        // Put divPost substring back into divContent substring
-	        String sub_divCt_new = replaceSub(sub_divCt_1, sub_divP_2, a_divP_o, b_divP_c);
+            String sub_divCt_new = replaceSub(sub_divCt, sub_divP_3, a_divP_o, b_divP_c);
 	        
 	        // Put divContent substring back into container substring
 	        String sub_divC_new = replaceSub(sub_divC_2, sub_divCt_new, a_divCt_o, a_divCt_c);

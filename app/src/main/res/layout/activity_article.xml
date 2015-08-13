@@ -7,7 +7,7 @@
     tools:ignore="MergeRootFrame"
     android:background="@android:color/white" >
 
-    <WebView
+    <app.morningsignout.com.morningsignoff.CustomWebView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/webView_article"
