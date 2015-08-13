@@ -32,6 +32,22 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
 		Log.d("URLToMobileArticle", "Loaded webpage " + link);
     }
 
+    // Sections of html that the content post will specifically be in
+    // o = open tag, c = close tag
+    static final String body_o = "<body>", body_c = "</body>";
+    static final String divContainer_o = "<div class=\"container\">", divContainer_c = "</div>";
+    static final String divContent_o = "<div class=\"content content--single\">", divContent_c = "</div>";
+    static final String divPost_o = "<div class=\"content__post\">", divPost_c = "</div>";
+
+    // Trimming these elements
+    static final String header_o = "<header>", header_c = "</header>";
+    static final String footer_o = "<footer>", footer_c = "</footer>";
+    static final String divSSBA_o = "<div class=\"ssba ssba-wrap\">", divSSBA_c = "</div>";
+    static final String divRelated_o = "<div class=\"content__related\">", divRelated_c = "</div>";
+    static final String divDisqusThread_o = "<div id=\"disqus_thread\">", divDisqusThread_c = "</div>";
+    static final String noComment_o = "<p class=\"nocomments\">", noComment_c = "</p>";
+    static final String divPostNav_o = "<div class=\"post-nav\">", divPostNav_c = "</div>";
+
 	public static String getArticle(String link) {
 		URL url;
 		String html_new;
@@ -44,21 +60,6 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
 	        String html = "";
 	        
 	        while ((input = in.readLine()) != null) html += (input + "\n");
-
-	        // Sections of html that the content post will specifically be in
-	        // o = open tag, c = close tag
-	        String body_o = "<body>", body_c = "</body>"; 
-	        String divContainer_o = "<div class=\"container\">", divContainer_c = "</div>";
-	        String divContent_o = "<div class=\"content content--single\">", divContent_c = "</div>";
-	        String divPost_o = "<div class=\"content__post\">", divPost_c = "</div>";
-	        
-	        // Trimming these elements
-	        String header_o = "<header>", header_c = "</header>";
-	        String footer_o = "<footer>", footer_c = "</footer>";
-	        String divRelated_o = "<div class=\"content__related\">", divRelated_c = "</div>";
-	        String divDisqusThread_o = "<div id=\"disqus_thread\">", divDisqusThread_c = "</div>";
-	        String divPostNav_o = "<div class=\"post-nav\">", divPostNav_c = "</div>";
-            String divSSBA_o = "<div class=\"ssba ssba-wrap\">", divSSBA_c = "</div>";
 
 	        // Find body substring
 	        int b_o = html.indexOf(body_o); 						// start of body
@@ -87,22 +88,41 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
 	        String sub_divCt = sub_divC_2.substring(a_divCt_o, a_divCt_c);
 	        
 	        // Trim divRelated
-	        int divR_o = sub_divCt.indexOf(divRelated_o);												// open div of content__related
-	        int a_divR_c = sub_divCt.lastIndexOf(divRelated_c);											// close div of divContent
-	        int b_divR_c = sub_divCt.lastIndexOf(divRelated_c, a_divR_c - 1) + divRelated_c.length();	// close div of divRelated
-	        String sub_divCt_1 = deleteSub(sub_divCt, divR_o, b_divR_c);
+//	        int divR_o = sub_divCt.indexOf(divRelated_o);												// open div of content__related
+//	        int a_divR_c = sub_divCt.lastIndexOf(divRelated_c);											// close div of divContent
+//	        int b_divR_c = sub_divCt.lastIndexOf(divRelated_c, a_divR_c - 1) + divRelated_c.length();	// close div of divRelated
+//	        String sub_divCt_1 = deleteSub(sub_divCt, divR_o, b_divR_c);
 
-	        // Find divPost substring
-	        int a_divP_o = sub_divCt.indexOf(divPost_o);											// open div of content__post
-	        int a_divP_c = sub_divCt.lastIndexOf(divPost_c);										// close div of divContent
-	        int b_divP_c = sub_divCt.lastIndexOf(divPost_c, a_divP_c - 1) + divPost_c.length();	    // close div of divPost
-	        String sub_divP = sub_divCt.substring(a_divP_o, b_divP_c);
+            // Trim divRelated temporarily
+            int divR_o = sub_divCt.indexOf(divRelated_o);												// open div of content__related
+            int a_divR_c = sub_divCt.lastIndexOf(divRelated_c);											// close div of divContent
+            int b_divR_c = sub_divCt.lastIndexOf(divRelated_c, a_divR_c - 1) + divRelated_c.length();	// close div of divRelated
+            String sub_divR = sub_divCt.substring(divR_o, b_divR_c);
+            String sub_divCt_1 = deleteSub(sub_divCt, divR_o, b_divR_c);
 
-	        // Trim divDisqusThread
-	        int divDT_o = sub_divP.indexOf(divDisqusThread_o);														// open div of disqus_thread
-	        int a_divDT_c = sub_divP.lastIndexOf(divDisqusThread_c);												// close div of divPost
-	        int b_divDT_c = sub_divP.lastIndexOf(divDisqusThread_c, a_divDT_c - 1) + divDisqusThread_c.length();	// close div of divDT
-	        String sub_divP_1 = deleteSub(sub_divP, divDT_o, b_divDT_c);
+            // Find divPost substring
+            int a_divP_o = sub_divCt_1.indexOf(divPost_o);											// open div of content__post
+            int a_divP_c = sub_divCt_1.lastIndexOf(divPost_c);										// close div of divContent
+            int b_divP_c = sub_divCt_1.lastIndexOf(divPost_c, a_divP_c - 1) + divPost_c.length();		// close div of divPost
+            String sub_divP = sub_divCt_1.substring(a_divP_o, b_divP_c);
+
+            // Trim divDisqusThread
+            String sub_divP_1;
+            if (sub_divP.contains(divDisqusThread_o)) {
+                int divDT_o = sub_divP.indexOf(divDisqusThread_o);														// open div of disqus_thread
+                int a_divDT_c = sub_divP.lastIndexOf(divDisqusThread_c);												// close div of divPost
+                int b_divDT_c = sub_divP.lastIndexOf(divDisqusThread_c, a_divDT_c - 1) + divDisqusThread_c.length();	// close div of divDT
+
+//		        System.out.println(sub_divP.substring(divDT_o));
+
+                sub_divP_1 = deleteSub(sub_divP, divDT_o, b_divDT_c);
+            }
+            // Trim no comment section
+            else {
+                int divNC_o = sub_divP.indexOf(noComment_o);
+                int divNC_c = sub_divP.indexOf(noComment_c, divNC_o) + noComment_c.length();
+                sub_divP_1 = deleteSub(sub_divP, divNC_o, divNC_c);
+            }
 
 	        // Trim divPostNav
 	        int divPN_o = sub_divP_1.indexOf(divPostNav_o);													// open div of post-nav
@@ -127,9 +147,12 @@ public class URLToMobileArticle extends AsyncTask<String, Void, String> {
 
 	        // Put divPost substring back into divContent substring
             String sub_divCt_new = replaceSub(sub_divCt, sub_divP_3, a_divP_o, b_divP_c);
-	        
-	        // Put divContent substring back into container substring
-	        String sub_divC_new = replaceSub(sub_divC_2, sub_divCt_new, a_divCt_o, a_divCt_c);
+
+//            // Put divRelated substring back into divContent (appending)
+//            String sub_divCt_new_2 = sub_divCt_new + sub_divR;
+
+            // Put divContent substring back into container substring
+            String sub_divC_new = replaceSub(sub_divC_2, sub_divCt_new, a_divCt_o, a_divCt_c);
 	        
 	        // Put divContainer substring back into body substring
 	        String sub_b_new = replaceSub(sub_b, sub_divC_new, a_divC_o, b_divC_c);
