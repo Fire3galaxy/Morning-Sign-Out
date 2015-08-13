@@ -32,7 +32,7 @@ import java.util.Map;
 // Activity class created in FetchListArticleTask when user clicks on an article from the ListView
 public class ArticleActivity extends ActionBarActivity {
     private String category;
-    private CustomWebView webView;
+    private WebView webView;
     private ArticleWebViewClient webViewClient;
 
     @Override
@@ -62,7 +62,7 @@ public class ArticleActivity extends ActionBarActivity {
             webView = (CustomWebView) findViewById(R.id.webView_article);
             webViewClient = new ArticleWebViewClient();
             webView.setWebViewClient(webViewClient);
-//            new URLToMobileArticle(webView).execute(getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
+            new URLToMobileArticle(webView).execute(getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT));
         }
     }
 
@@ -126,17 +126,21 @@ public class ArticleActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
 
-        // URL from CategoryActivity
-        String intentURL = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
+        String searchReturnUrl = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);
+        String webviewUrl = webView.getUrl();
+        String intentUrl = getIntent().getStringExtra(Intent.EXTRA_HTML_TEXT);
 
-        // Set webView to new article
-        if (intentURL != null) new URLToMobileArticle(webView).execute(intentURL);
-        else {
-            // If statement is reached, then intent originated from SearchResultsActivity
-            intentURL = getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT);
-            new URLToMobileArticle(webView).execute(intentURL);
-            Log.d("ArticleActivity", "Loading: " + intentURL);
+        // 1. App has returned from search w/ result
+        if (searchReturnUrl != null) {
+            searchReturnUrl = new String(getIntent().getStringExtra(Intent.EXTRA_RETURN_RESULT));   // copy string
+            getIntent().removeExtra(Intent.EXTRA_RETURN_RESULT);        // Return url only valid once, remove it after use
+            new URLToMobileArticle(webView).execute(searchReturnUrl);
+            Log.d("ArticleActivity", "Loading: " + intentUrl);
         }
+        // 2. App was stopped/return to this activity from search w/o a result (do nothing)
+        else if (webviewUrl != null && !webviewUrl.isEmpty()) ;
+        // 3. App has not loaded its first article yet
+        else if (intentUrl != null) new URLToMobileArticle(webView).execute(intentUrl);
     }
 
     // view parameter needed for title.xml onClick()
@@ -170,13 +174,24 @@ class ArticleWebViewClient extends WebViewClient {
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView wb, String url) {
         WebResourceResponse wbresponse = super.shouldInterceptRequest(wb, url);
+        Uri requestUrl = Uri.parse(url);
 
-        if (Uri.parse(url).getPath().equals("/alcohol-and-caffeine/")) {
-            Log.d(LOG_NAME, "changing webresponse");
+        /* Not from morningsignout, e.g. googleapis, gstatic, or gravatar
+         * or an image/theme/plugin from wordpress
+         * or a .* file, e.g. favicon.ico
+         */
+        if (!requestUrl.getHost().endsWith("morningsignout.com")
+                || requestUrl.getPathSegments().get(0).equals("wp-content")
+                || requestUrl.getPathSegments().get(0).matches(".*\\.[a-zA-Z]+"))
+            return wbresponse;
+
+        // Article Page
+        if (requestUrl.getPathSegments().size() == 1) {
+            Log.d(LOG_NAME, "changing webresponse to article page");
 
             String mimeType = "text/html";
             String encoding = "gzip"; // Find encoding https://en.wikipedia.org/wiki/HTTP_compression
-            String html = URLToMobileArticle.getArticle("http://morningsignout.com/alcohol-and-caffeine/");
+            String html = URLToMobileArticle.getArticle(requestUrl.toString());
             ByteArrayInputStream bais = new ByteArrayInputStream(html.getBytes());
 
             wbresponse = new WebResourceResponse(mimeType,
