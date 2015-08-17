@@ -34,6 +34,7 @@ public class ArticleActivity extends ActionBarActivity {
     private String category;
     private WebView webView;
     private ArticleWebViewClient webViewClient;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,7 @@ public class ArticleActivity extends ActionBarActivity {
         /* Search results in new activity, clicked article passed back to articleActivity
            Associate searchable configuration with the SearchView */
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 
         ComponentName componentName = new ComponentName(this, SearchResultsActivity.class);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName));
@@ -92,23 +93,33 @@ public class ArticleActivity extends ActionBarActivity {
             case android.R.id.home:
                 if (webView != null && webView.canGoBack()) {  // Go back in webView history
                     webView.goBack();
+                    return true;
                 } else {                    // Return to front page (without recreating parent)
                     returnToParent(null);
+                    return true;
                 }
-                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Check if the key event was the Back button and if there's history
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && webView.canGoBack()) {
-            webView.goBack();
-            return true;
+        // Check if the key event was the Back button
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            if (!searchView.isIconified()) {    // Check if searchView is expanded
+                searchView.setIconified(true);      // close searchView
+                getSupportActionBar().collapseActionView();
+
+                // two ideas: searchView.onCollapseActionView twice, actionbar direct method.
+                return true;
+            }
+            else if (webView.canGoBack()) {     // Check if webView has history
+                webView.goBack();                   // Back through web history
+                return true;
+            }
         }
 
-        // If it wasn't the Back key or there's no web page history, use default system behavior
+        // If it wasn't the Back key or none of the conditions are met, use default system behavior
         return super.onKeyDown(keyCode, event);
     }
 
