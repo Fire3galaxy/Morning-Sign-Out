@@ -19,6 +19,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.content.res.TypedArray;
+
+import java.util.ArrayList;
 
 // Category page activity
 public class CategoryActivity extends ActionBarActivity {
@@ -31,6 +34,10 @@ public class CategoryActivity extends ActionBarActivity {
     private String[] categories_urls,   // category strings for url usage
             categories_titles;          // ... for Title usage
     private int position;               // position in category array
+
+    private TypedArray navMenuIcons;
+    private ArrayList<NavDrawerItem> navDrawerItems;
+    private NavDrawerListAdapter adapter;
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -57,13 +64,39 @@ public class CategoryActivity extends ActionBarActivity {
 
 
 
-        // For DrawerLayout (no fragment)
-        mDrawerList = (ListView) findViewById(R.id.listView_slide);
-        ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
-                R.layout.list_items_slide,
-                categories_titles);
+//        // For DrawerLayout (no fragment)
+//        mDrawerList = (ListView) findViewById(R.id.listView_slide);
+//        ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(this,
+//                R.layout.list_items_slide,
+//                categories_titles);
+//
+//        mDrawerList.setAdapter(mAdapter); // Set up adapter for listview
+//        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-        mDrawerList.setAdapter(mAdapter); // Set up adapter for listview
+
+        // nav drawer icons from resources
+        navMenuIcons = getResources()
+                .obtainTypedArray(R.array.categories_icons);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.listView_slide);
+
+        navDrawerItems = new ArrayList<NavDrawerItem>();
+
+        // adding nav drawer items to array
+        navDrawerItems.add(new NavDrawerItem(categories_titles[0], navMenuIcons.getResourceId(0, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[1], navMenuIcons.getResourceId(1, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[2], navMenuIcons.getResourceId(2, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[3], navMenuIcons.getResourceId(3, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[4], navMenuIcons.getResourceId(4, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[5], navMenuIcons.getResourceId(5, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[6], navMenuIcons.getResourceId(6, -1)));
+        navDrawerItems.add(new NavDrawerItem(categories_titles[7], navMenuIcons.getResourceId(7, -1)));
+
+        navMenuIcons.recycle();
+        adapter = new NavDrawerListAdapter(getApplicationContext(),
+                navDrawerItems);
+        mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // Change up button of actionbar to 3 horizontal bars for slide
@@ -93,6 +126,15 @@ public class CategoryActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         ImageButton ib = (ImageButton) getLayoutInflater().inflate(R.layout.title_main, null);
+        ib.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent categoryPageIntent = new Intent(getApplicationContext(), CategoryActivity.class);
+                categoryPageIntent.putExtra(Intent.EXTRA_TITLE, 0);
+                finish();
+                startActivity(categoryPageIntent);
+            }
+        });
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(Gravity.CENTER);
         this.getSupportActionBar().setCustomView(ib, params);
 

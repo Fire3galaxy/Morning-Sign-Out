@@ -31,8 +31,8 @@ class SingleRow{
 
     static SingleRow newInstance(Article article) {
         String mDescription;
-        if (article.getDescription() == null) mDescription = "";
-        else mDescription = article.getDescription();
+        if (article.getAuthor() == null) mDescription = "";
+        else mDescription = article.getAuthor();
 
         return new SingleRow(article.getTitle(),
                 mDescription,

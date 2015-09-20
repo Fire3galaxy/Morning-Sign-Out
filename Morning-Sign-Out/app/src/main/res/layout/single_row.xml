@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="300dp"
+    android:layout_height="275dp"
     android:background="@drawable/row_item_background"
     android:visibility="visible"
     android:elevation="3dp">
@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_gravity="center_vertical"
-            android:layout_weight="7">
+            android:layout_weight="3">
 
             <TextView
                 android:layout_width="match_parent"
@@ -64,7 +64,7 @@
                 android:background="#00ffffff"
                 android:ellipsize="end"
                 android:lines="5"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp" />
         </LinearLayout>
     </LinearLayout>

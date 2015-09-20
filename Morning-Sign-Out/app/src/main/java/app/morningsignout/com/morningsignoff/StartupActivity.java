@@ -13,10 +13,26 @@ public class StartupActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Immediately start new Recent Category Activity
-        Intent categoryPageIntent = new Intent(this, CategoryActivity.class);
-        categoryPageIntent.putExtra(Intent.EXTRA_TITLE, 0);
-        startActivity(categoryPageIntent);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.splash_screen);
+
+        Thread welcomeThread = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    super.run();
+                    sleep(2000);
+                } catch (Exception e) {
+
+                } finally {
+
+                    Intent categoryPageIntent = new Intent(getApplicationContext(), CategoryActivity.class);
+                    categoryPageIntent.putExtra(Intent.EXTRA_TITLE, 0);
+                    finish();
+                    startActivity(categoryPageIntent);
+                }
+            }
+        };
+        welcomeThread.start();
     }
 }
